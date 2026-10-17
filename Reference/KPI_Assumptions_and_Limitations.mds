@@ -1,0 +1,95 @@
+# SwiftLog Logistics Supply Chain Analytics & Business Intelligence
+
+## Part 3 — KPI Assumptions and Limitations
+
+### 1. Purpose
+
+This document records the assumptions, data limitations, and calculation requirements affecting the KPIs developed for the SwiftLog Logistics Power BI solution. Unsupported KPIs are identified transparently rather than calculated using unverified data.
+
+### 2. Inventory Stock Level
+
+The Inventory dataset contains WarehouseID, ProductID, and Stock. The dataset initially contained three duplicate records, which were identified during data profiling.
+
+Stock records can repeat for the same warehouse-product combination with different stock values. Because there is no inventory date or timestamp, it is not possible to establish which record represents the latest stock position.
+
+**Assumption and limitation:** The Inventory Stock Level measure summarizes the recorded stock values. It must not automatically be interpreted as verified current stock across all warehouses. Different stock values for the same warehouse-product combination should not be removed as duplicates unless the records are confirmed to be duplicates.
+
+### 3. Inventory Turnover
+
+Inventory Turnover cannot currently be calculated reliably because the available data does not establish cost of goods sold and average inventory value over a defined period.
+
+**Data required:** Cost of goods sold and inventory valuation over time, or the appropriate opening and closing inventory values for the period.
+
+**Action:** Record this KPI as unsupported until the required information is available. Do not substitute total revenue divided by stock quantity.
+
+### 4. Supplier Performance Score
+
+The Suppliers dataset contains SupplierID and SupplierName. No verified relationship has been identified linking SupplierID to products, orders, shipments, or delivery performance.
+
+**Limitation:** Supplier-specific delivery reliability, quality, cost, and fulfillment performance cannot be calculated reliably from the available data.
+
+**Data required:** A verified supplier-to-product or supplier-to-purchase-order relationship, plus suitable supplier performance fields such as delivery dates, quantities ordered and received, defect rates, or agreed service levels.
+
+### 5. Warehouse Utilization
+
+The Warehouses dataset contains WarehouseID and Location but does not include warehouse capacity.
+
+**Limitation:** Warehouse utilization cannot be calculated as a percentage without a reliable capacity denominator and a valid measure of occupied capacity.
+
+**Data required:** Warehouse capacity and an appropriate measure of occupied space or capacity used. Recorded stock quantity alone does not establish physical warehouse utilization.
+
+### 6. Delivery Time, Delay, and On-Time Delivery
+
+Average Delivery Time, Average Delivery Delay, and On-Time Delivery Rate depend on the actual fields available in the delivery data.
+
+**Limitation:** These KPIs should only be reported if the dataset contains valid delivery duration or planned/actual delivery timing fields, or a reliable delivery-status field linked to shipment records. The presence of shipment records alone does not prove that delivery duration or delays can be measured.
+
+**Action:** Inspect the Delivery Performance and Shipments tables. If the required fields are unavailable, document the KPI as unsupported and request the missing delivery dates, expected dates, actual dates, or reliable delivery-status information.
+
+### 7. Return Rate and Returned Products
+
+Return Rate can be calculated only if the Returns dataset identifies returned orders consistently and contains a reliable order identifier. The measure should count distinct returned orders if the business definition is order-level return rate.
+
+**Limitation:** Returned Products analysis requires a product identifier in the Returns dataset or a reliable relationship from returned orders to their order items. Do not attribute a return to every product in an order unless that is explicitly the agreed business rule.
+
+### 8. Customer Retention
+
+A Repeat Customer Rate can be used as a practical alternative customer metric. It measures the proportion of customers with recorded orders who have placed more than one distinct order.
+
+**Limitation:** Repeat Customer Rate is not the same as formal period-based customer retention. A true retention calculation requires a defined customer cohort and a subsequent time period.
+
+### 9. Revenue Calculation
+
+Total Revenue depends on a valid Line Revenue field. The Order Items dataset contains Quantity, while Products contains UnitPrice.
+
+**Requirement:** Bring UnitPrice into Order Items through a validated ProductID merge in Power Query or use a valid model relationship and a DAX calculated column. Calculate line revenue as quantity multiplied by unit price only after verifying the join and data types.
+
+**Limitation:** If discounts, taxes, shipping charges, or cancellations are not represented in the data, the calculated amount may not equal recognized accounting revenue. Document the definition used.
+
+### 10. Stock Status Threshold
+
+The Stock Status categories use a provisional threshold: zero stock is Out of Stock, stock from 1 to 10 is Low Stock, and stock above 10 is Adequate Stock.
+
+**Limitation:** The threshold of 10 is an analytical assumption, not a confirmed SwiftLog replenishment policy. It should be replaced if the business provides official product-level reorder thresholds.
+
+### 11. General Data Quality and Interpretation
+
+KPI results depend on accurate keys, valid relationships, correct data types, and appropriate aggregation. Measures should be checked against source data and reviewed under relevant slicers before use in decision-making.
+
+Unsupported KPIs should remain clearly labelled as unavailable until additional data is provided. No values should be invented to make every KPI appear available.
+
+### 12. Recommended Additional Data
+
+To improve the analysis, request:
+
+- Inventory snapshot dates, stock movement history, and inventory cost.
+- Cost of goods sold or product cost.
+- Supplier-to-product or supplier-to-purchase-order links and supplier performance records.
+- Warehouse capacity and occupied-capacity information.
+- Planned and actual shipment delivery dates, or verified delivery duration and status.
+- A consistent relationship between returns, orders, and returned order items.
+- Official business definitions and thresholds for each KPI.
+
+## Conclusion
+
+The Power BI solution should report supported KPIs accurately, label assumptions clearly, and identify the additional data needed to calculate unsupported KPIs. This maintains transparency and prevents misleading business conclusions.
